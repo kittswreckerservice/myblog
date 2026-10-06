@@ -184,22 +184,23 @@
 
     </div>
 
-    <!-- Firebase SDK Imports -->
+    <!-- Firebase SDK Imports (Fixed URLs) -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://gstatic.com";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://gstatic.com";
 
-        // !!! PASTE YOUR UNIQUE FIREBASE CONFIG OBJECT HERE !!!
-         const firebaseConfig = {
-    apiKey: "AIzaSyBjXUu2ovU7ooVAjU8vPd-itBXTSsgUqyA",
-    authDomain: "kws-blog-234c0.firebaseapp.com",
-    projectId: "kws-blog-234c0",
-    storageBucket: "kws-blog-234c0.firebasestorage.app",
-    messagingSenderId: "704244907002",
-    appId: "1:704244907002:web:ffbd078b81074a0b948243",
-    measurementId: "G-H2WXQD7Y8E"
-  };
+        // Your Config Keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjXUu2ovU7ooVAjU8vPd-itBXTSsgUqyA",
+            authDomain: "kws-blog-234c0.firebaseapp.com",
+            projectId: "kws-blog-234c0",
+            storageBucket: "kws-blog-234c0.firebasestorage.app",
+            messagingSenderId: "704244907002",
+            appId: "1:704244907002:web:ffbd078b81074a0b948243",
+            measurementId: "G-H2WXQD7Y8E"
+        };
+
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -222,27 +223,21 @@
         }
 
         // Keep a real-time global connection to your database 
-        // REPLACE IT WITH THIS:
-// REPLACE your current onSnapshot block with this:
-const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-onSnapshot(q, (snapshot) => {
-    blogPosts = [];
-    snapshot.forEach((doc) => {
-        blogPosts.push({ id: doc.id, ...doc.data() });
-    });
-    renderBlogPosts();
-}, (error) => {
-    console.error("Firebase Error:", error);
-    // This will force a popup window to show you the exact broken setting
-    alert("CRITICAL FIREBASE ERROR: " + error.message); 
-    document.getElementById('posts-container').innerHTML = 
-        `<p style="text-align: center; color: red; font-weight: bold;">
-            Database Error: ${error.message}
-         </p>`;
-});
-
-
+        const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            blogPosts = [];
+            snapshot.forEach((doc) => {
+                blogPosts.push({ id: doc.id, ...doc.data() });
+            });
             renderBlogPosts();
+        }, (error) => {
+            console.error("Firebase Error:", error);
+            alert("DATABASE FEED ERROR: " + error.message);
+            document.getElementById('posts-container').innerHTML = 
+                `<p style="text-align: center; color: red; font-weight: bold;">
+                    Database Error: ${error.message}<br>
+                    Please verify your Firestore database Rules tab is set to Test Mode.
+                 </p>`;
         });
 
         window.togglePostWindow = function() {
@@ -257,15 +252,3 @@ onSnapshot(q, (snapshot) => {
             submitBtn.disabled = true;
             
             const author = document.getElementById('author').value;
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-            const imageFile = document.getElementById('image-upload').files[0];
-
-            let imageUrl = "";
-            let imageStoragePath = "";
-
-            try {
-                // If a picture is attached, upload it to Firebase Storage cloud buckets
-                if (imageFile) {
-                    const uniqueFilename = Date.now() + "_" + imageFile.name;
-                    imageStoragePath = `blog_images/${uniqueFilename}`;
