@@ -223,6 +223,7 @@
 
         // Keep a real-time global connection to your database 
         // REPLACE IT WITH THIS:
+// REPLACE your current onSnapshot block with this:
 const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
 onSnapshot(q, (snapshot) => {
     blogPosts = [];
@@ -232,12 +233,14 @@ onSnapshot(q, (snapshot) => {
     renderBlogPosts();
 }, (error) => {
     console.error("Firebase Error:", error);
+    // This will force a popup window to show you the exact broken setting
+    alert("CRITICAL FIREBASE ERROR: " + error.message); 
     document.getElementById('posts-container').innerHTML = 
         `<p style="text-align: center; color: red; font-weight: bold;">
-            Database Error: ${error.message}<br>
-            Please check your Firebase configuration or security rules.
+            Database Error: ${error.message}
          </p>`;
 });
+
 
             renderBlogPosts();
         });
