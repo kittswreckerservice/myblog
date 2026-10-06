@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Community Blog Feed</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .blog-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        /* Secret Admin Trigger Title */
+        .secret-title {
+            cursor: default;
+            user-select: none;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #0076ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .btn:hover { background: #005bc5; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger {
+            background: #dc3545;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .btn-danger:hover { background: #bd2130; }
+        
+        /* Post Window Form Styling */
+        .form-window {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .form-group input[type="text"], .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-group textarea { height: 150px; resize: vertical; }
+        
+        /* Blog List Feed */
+        .blog-posts-list { display: flex; flex-direction: column; gap: 25px; }
+        .post-card-wrapper {
+            position: relative;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .post-card { cursor: pointer; }
+        .post-title { margin-top: 0; color: #111; }
+        .post-meta { font-size: 0.85rem; color: #777; margin-bottom: 15px; }
+        .post-thumbnail {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        /* Single Post View */
+        .back-button {
+            display: inline-block;
+            background: #222;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .full-post-content { background: #ffffff; padding: 40px; border-radius: 8px; }
+        .full-post-image { width: 100%; max-height: 500px; object-fit: contain; margin-bottom: 20px; border-radius: 6px; }
+        .hidden { display: none !important; }
+        .admin-banner {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blog-container">
+        
+        <!-- Blog Main Page View -->
+        <div id="blog-main-view">
+            <div id="admin-indicator" class="admin-banner hidden">
+                🛠️ Admin Mode Active (You can delete any post)
+            </div>
+            
+            <div class="blog-header">
+                <!-- Clicking this H1 header 5 times triggers your private Admin Mode -->
+                <h1 class="secret-title" onclick="trackAdminClicks()">Community Blog Feed</h1>
+                <p>Share your stories, thoughts, and pictures globally!</p>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn" onclick="togglePostWindow()">✍️ Create New Post</button>
+            </div>
+
+            <!-- Typing Post Window -->
+            <div id="post-window" class="form-window hidden">
+                <h3 style="margin-top:0;">Write a New Global Post</h3>
+                <form id="blog-form" onsubmit="savePost(event)">
+                    <div class="form-group">
+                        <label for="author">Your Name</label>
+                        <input type="text" id="author" required placeholder="Anonymous or your handle">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Post Title</label>
+                        <input type="text" id="title" required placeholder="Give your post a title">
+                    </div>
+                    <div class="form-group">
+                        <label for="image-upload">Upload a Picture</label>
+                        <input type="file" id="image-upload" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="content">What's on your mind?</label>
+                        <textarea id="content" required placeholder="Type your text content here..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="togglePostWindow()">Cancel</button>
+                        <button type="submit" id="submit-btn" class="btn">Publish Post</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="posts-container" class="blog-posts-list">
+                <p style="text-align: center; color: #777;">Loading global feed...</p>
+            </div>
+        </div>
+
+        <!-- Single Full Post View -->
+        <div id="blog-single-view" class="hidden">
+            <span class="back-button" onclick="showMainView()">&larr; Back to Feed</span>
+            <article class="full-post-content">
+                <h1 id="full-title"></h1>
+                <div class="post-meta" id="full-meta"></div>
+                <img id="full-image" class="full-post-image hidden" src="" alt="Post image">
+                <div id="full-body"></div>
+            </article>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://gstatic.com";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://gstatic.com";
+
+        // !!! PASTE YOUR UNIQUE FIREBASE CONFIG OBJECT HERE !!!
+         const firebaseConfig = {
+    apiKey: "AIzaSyBjXUu2ovU7ooVAjU8vPd-itBXTSsgUqyA",
+    authDomain: "kws-blog-234c0.firebaseapp.com",
+    projectId: "kws-blog-234c0",
+    storageBucket: "kws-blog-234c0.firebasestorage.app",
+    messagingSenderId: "704244907002",
+    appId: "1:704244907002:web:ffbd078b81074a0b948243",
+    measurementId: "G-H2WXQD7Y8E"
+  };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let blogPosts = [];
+        let isAdmin = false;
+
+        // Hidden Easter Egg Admin Trigger (Click Header 5 times)
+        let clickCount = 0;
+        window.trackAdminClicks = function() {
+            clickCount++;
+            if (clickCount >= 5) {
+                isAdmin = !isAdmin; // toggle mode
+                clickCount = 0;
+                document.getElementById('admin-indicator').classList.toggle('hidden', !isAdmin);
+                renderBlogPosts(); // re-render list with or without delete buttons
+                alert(isAdmin ? "Admin mode unlocked! Delete buttons are now visible." : "Admin mode hidden.");
+            }
+        }
+
+        // Keep a real-time global connection to your database 
+        // REPLACE IT WITH THIS:
+const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+onSnapshot(q, (snapshot) => {
+    blogPosts = [];
+    snapshot.forEach((doc) => {
+        blogPosts.push({ id: doc.id, ...doc.data() });
+    });
+    renderBlogPosts();
+}, (error) => {
+    console.error("Firebase Error:", error);
+    document.getElementById('posts-container').innerHTML = 
+        `<p style="text-align: center; color: red; font-weight: bold;">
+            Database Error: ${error.message}<br>
+            Please check your Firebase configuration or security rules.
+         </p>`;
+});
+
+            renderBlogPosts();
+        });
+
+        window.togglePostWindow = function() {
+            document.getElementById('post-window').classList.toggle('hidden');
+        }
+
+        // Save a brand new post out to Firebase Cloud
+        window.savePost = async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = "Publishing...";
+            submitBtn.disabled = true;
+            
+            const author = document.getElementById('author').value;
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const imageFile = document.getElementById('image-upload').files[0];
+
+            let imageUrl = "";
+            let imageStoragePath = "";
+
+            try {
+                // If a picture is attached, upload it to Firebase Storage cloud buckets
+                if (imageFile) {
+                    const uniqueFilename = Date.now() + "_" + imageFile.name;
+                    imageStoragePath = `blog_images/${uniqueFilename}`;
