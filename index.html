@@ -22,7 +22,7 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        /* Secret Admin Trigger Title */
+        /* Secret Admin Trigger Title Elements */
         .secret-title {
             cursor: default;
             user-select: none;
@@ -51,6 +51,9 @@
             font-size: 0.8rem;
             border-radius: 4px;
             margin-top: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
         }
         .btn-danger:hover { background: #bd2130; }
         
@@ -74,7 +77,7 @@
         }
         .form-group textarea { height: 150px; resize: vertical; }
         
-        /* Blog List Feed */
+        /* Blog List Feed Box Layout */
         .blog-posts-list { display: flex; flex-direction: column; gap: 25px; }
         .post-card-wrapper {
             position: relative;
@@ -94,7 +97,7 @@
             margin-top: 15px;
         }
 
-        /* Single Post View */
+        /* Single Post Full View Screen Layout */
         .back-button {
             display: inline-block;
             background: #222;
@@ -123,14 +126,14 @@
 
     <div class="blog-container">
         
-        <!-- Blog Main Page View -->
+        <!-- Blog Main Page View Section -->
         <div id="blog-main-view">
             <div id="admin-indicator" class="admin-banner hidden">
                 🛠️ Admin Mode Active (You can delete any post)
             </div>
             
             <div class="blog-header">
-                <!-- Clicking this H1 header 5 times triggers your private Admin Mode -->
+                <!-- Click this H1 text title 5 times in a row to unlock deleting options -->
                 <h1 class="secret-title" onclick="trackAdminClicks()">Community Blog Feed</h1>
                 <p>Share your stories, thoughts, and pictures globally!</p>
             </div>
@@ -139,7 +142,7 @@
                 <button class="btn" onclick="togglePostWindow()">✍️ Create New Post</button>
             </div>
 
-            <!-- Typing Post Window -->
+            <!-- Typing Post Modal Window -->
             <div id="post-window" class="form-window hidden">
                 <h3 style="margin-top:0;">Write a New Global Post</h3>
                 <form id="blog-form" onsubmit="savePost(event)">
@@ -171,7 +174,7 @@
             </div>
         </div>
 
-        <!-- Single Full Post View -->
+        <!-- Single Full Post Target Container (Hidden by default) -->
         <div id="blog-single-view" class="hidden">
             <span class="back-button" onclick="showMainView()">&larr; Back to Feed</span>
             <article class="full-post-content">
@@ -184,16 +187,16 @@
 
     </div>
 
-    <!-- Firebase SDK Imports (Fixed URLs) -->
+    <!-- Firebase System Module Architecture SDK CDN Links -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://gstatic.com";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://gstatic.com";
 
-        // Your Config Keys
+        // Verified Active Connection Coordinates
         const firebaseConfig = {
             apiKey: "AIzaSyBjXUu2ovU7ooVAjU8vPd-itBXTSsgUqyA",
-            authDomain: "kws-blog-234c0.firebaseapp.com",
+            authDomain: "://firebaseapp.com",
             projectId: "kws-blog-234c0",
             storageBucket: "kws-blog-234c0.firebasestorage.app",
             messagingSenderId: "704244907002",
@@ -201,7 +204,7 @@
             measurementId: "G-H2WXQD7Y8E"
         };
 
-        // Initialize Firebase
+        // Fire Up Core Firebase Modules
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
@@ -209,34 +212,38 @@
         let blogPosts = [];
         let isAdmin = false;
 
-        // Hidden Easter Egg Admin Trigger (Click Header 5 times)
+        // Hidden Administration Multi-Click Routine Setup
         let clickCount = 0;
         window.trackAdminClicks = function() {
             clickCount++;
             if (clickCount >= 5) {
-                isAdmin = !isAdmin; // toggle mode
+                isAdmin = !isAdmin;
                 clickCount = 0;
                 document.getElementById('admin-indicator').classList.toggle('hidden', !isAdmin);
-                renderBlogPosts(); // re-render list with or without delete buttons
-                alert(isAdmin ? "Admin mode unlocked! Delete buttons are now visible." : "Admin mode hidden.");
+                renderBlogPosts();
+                alert(isAdmin ? "Admin mode unlocked! Delete controls are now active." : "Admin mode closed.");
             }
         }
 
-        // Keep a real-time global connection to your database 
-        const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
+        // Real-Time Sync Pipeline Hook (Index-Free Sorting Logic)
+        const collectionRef = collection(db, "posts");
+        onSnapshot(collectionRef, (snapshot) => {
             blogPosts = [];
             snapshot.forEach((doc) => {
                 blogPosts.push({ id: doc.id, ...doc.data() });
             });
+            
+            // Native UI engine array timeline arrangement mechanism
+            blogPosts.sort((a, b) => b.timestamp - a.timestamp);
+            
             renderBlogPosts();
         }, (error) => {
-            console.error("Firebase Error:", error);
-            alert("DATABASE FEED ERROR: " + error.message);
+            console.error("Firebase Operational Engine Error Details:", error);
+            alert("CRITICAL FIREBASE RUNTIME ERROR:\n" + error.message);
             document.getElementById('posts-container').innerHTML = 
                 `<p style="text-align: center; color: red; font-weight: bold;">
-                    Database Error: ${error.message}<br>
-                    Please verify your Firestore database Rules tab is set to Test Mode.
+                    Database Error Hook: ${error.message}<br>
+                    Please make sure your Firebase Firestore Rules allow read/write actions.
                  </p>`;
         });
 
@@ -244,11 +251,4 @@
             document.getElementById('post-window').classList.toggle('hidden');
         }
 
-        // Save a brand new post out to Firebase Cloud
-        window.savePost = async function(e) {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.innerText = "Publishing...";
-            submitBtn.disabled = true;
-            
-            const author = document.getElementById('author').value;
+        // Write New Record Out to Firestore Cloud Databases
