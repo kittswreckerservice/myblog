@@ -22,7 +22,6 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        /* Secret Admin Trigger Title Elements */
         .secret-title {
             cursor: default;
             user-select: none;
@@ -133,7 +132,6 @@
             </div>
             
             <div class="blog-header">
-                <!-- Click this H1 text title 5 times in a row to unlock deleting options -->
                 <h1 class="secret-title" onclick="trackAdminClicks()">Community Blog Feed</h1>
                 <p>Share your stories, thoughts, and pictures globally!</p>
             </div>
@@ -142,7 +140,7 @@
                 <button class="btn" onclick="togglePostWindow()">✍️ Create New Post</button>
             </div>
 
-            <!-- Typing Post Modal Window -->
+            <!-- Typing Post Window -->
             <div id="post-window" class="form-window hidden">
                 <h3 style="margin-top:0;">Write a New Global Post</h3>
                 <form id="blog-form" onsubmit="savePost(event)">
@@ -174,7 +172,7 @@
             </div>
         </div>
 
-        <!-- Single Full Post Target Container (Hidden by default) -->
+        <!-- Single Full Post View Screen Layout -->
         <div id="blog-single-view" class="hidden">
             <span class="back-button" onclick="showMainView()">&larr; Back to Feed</span>
             <article class="full-post-content">
@@ -187,13 +185,12 @@
 
     </div>
 
-    <!-- Firebase System Module Architecture SDK CDN Links -->
+    <!-- Firebase SDK Imports -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://gstatic.com";
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://gstatic.com";
 
-        // Verified Active Connection Coordinates
         const firebaseConfig = {
             apiKey: "AIzaSyBjXUu2ovU7ooVAjU8vPd-itBXTSsgUqyA",
             authDomain: "://firebaseapp.com",
@@ -204,15 +201,13 @@
             measurementId: "G-H2WXQD7Y8E"
         };
 
-        // Fire Up Core Firebase Modules
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app, "default");
+        const db = getFirestore(app, "(default)");
         const storage = getStorage(app);
 
         let blogPosts = [];
         let isAdmin = false;
 
-        // Hidden Administration Multi-Click Routine Setup
         let clickCount = 0;
         window.trackAdminClicks = function() {
             clickCount++;
@@ -225,7 +220,6 @@
             }
         }
 
-        // Real-Time Sync Pipeline Hook (Index-Free Sorting Logic)
         const collectionRef = collection(db, "posts");
         onSnapshot(collectionRef, (snapshot) => {
             blogPosts = [];
@@ -233,9 +227,7 @@
                 blogPosts.push({ id: doc.id, ...doc.data() });
             });
             
-            // Native UI engine array timeline arrangement mechanism
             blogPosts.sort((a, b) => b.timestamp - a.timestamp);
-            
             renderBlogPosts();
         }, (error) => {
             console.error("Firebase Operational Engine Error Details:", error);
@@ -251,4 +243,13 @@
             document.getElementById('post-window').classList.toggle('hidden');
         }
 
-        // Write New Record Out to Firestore Cloud Databases
+        // Fixed Corrected Async Syntax Declaration for Saving
+        window.savePost = async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = "Publishing...";
+            submitBtn.disabled = true;
+            
+            const author = document.getElementById('author').value;
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
