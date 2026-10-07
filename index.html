@@ -168,7 +168,7 @@
             </div>
 
             <div id="posts-container" class="blog-posts-list">
-                <p style="text-align: center; color: #777;">Loading global feed...</p>
+                <p style="text-align: center; color: #777;">David screwed up but hes trying to fix it...</p>
             </div>
         </div>
 
@@ -243,7 +243,6 @@
             document.getElementById('post-window').classList.toggle('hidden');
         }
 
-        // Fixed Corrected Async Syntax Declaration for Saving
         window.savePost = async function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submit-btn');
@@ -253,3 +252,4 @@
             const author = document.getElementById('author').value;
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
+            const imageFileInput = document.getElementById('image-upload');
