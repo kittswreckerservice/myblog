@@ -206,7 +206,7 @@
 
         // Fire Up Core Firebase Modules
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(app, "kws-blog-234c0");
         const storage = getStorage(app);
 
         let blogPosts = [];
